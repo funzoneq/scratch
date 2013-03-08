@@ -1,6 +1,8 @@
 require 'httparty'
 require 'JSON'
 require 'persist'
+require 'checkup/job'
+require 'awesome_print'
 
 module Checkup
   class Wheresit < Checkup::Base
@@ -15,7 +17,7 @@ module Checkup
       fetch_sources
     end
 
-    def submit_check check_uri, services = [ 'http', 'dig', 'trace', 'ping' ]
+    def submit_check check_uri, services = [ 'http' ]
       uri = "#{@base_url}submit/"
       check_attrs = {
         'uri'       =>  check_uri,
@@ -36,7 +38,7 @@ module Checkup
 
       debug "fetch_result response:  #{res_resp}"
 
-      JSON.parse(res_resp)
+      JSON.parse(res_resp.body)
     end
 
     private
@@ -60,7 +62,7 @@ module Checkup
 
     def api_call method, path, options = {}
       call_opts = { :headers => base_headers }
-      call_opts.merge! options 
+      call_opts.merge! options
       debug "api_call - options: #{call_opts}"
       self.class.send method.to_sym, path, call_opts
     end
@@ -71,6 +73,6 @@ module Checkup
         'ContentType'   => 'application/json'
       }
     end
-  
+
   end
 end
